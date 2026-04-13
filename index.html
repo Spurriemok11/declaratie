@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Spurriemök">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="description" content="Declaratieformulier V.V. de Spurriemök Oirlo">
+  <title>Declaratie – Spurriemökken</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#111;--bg2:#1a1a1a;--surf:#222;--red:#d4213d;--red-dk:#a81830;
+      --red-gl:rgba(212,33,61,.15);--gold:#f0c530;--gold-m:#c9a820;
+      --gold-gl:rgba(240,197,48,.12);--grn:#2d8f45;--grn-gl:rgba(45,143,69,.12);
+      --txt:#f0ece4;--txt-m:#8a857c;--txt-d:#5a5650;--brd:#333;
+      --inp:#1a1a1a;--r:12px;--rs:8px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;min-height:100dvh;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+    .install-banner{display:none;background:linear-gradient(135deg,var(--red),var(--red-dk));padding:14px 20px;text-align:center;font-size:.88rem;font-weight:600;color:#fff;cursor:pointer;position:sticky;top:0;z-index:100}
+    .install-banner span{text-decoration:underline}
+    .install-banner.show{display:block}
+
+    .top-nav{background:var(--bg2);border-bottom:1px solid var(--brd);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+    .top-nav a{color:var(--txt-m);text-decoration:none;font-size:.82rem;font-weight:500;transition:color .2s}
+    .top-nav a:hover{color:var(--gold)}
+
+    .hero{background:var(--bg2);padding:40px 24px 48px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--brd)}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 0%,var(--red-gl),transparent 50%),radial-gradient(ellipse at 80% 0%,var(--gold-gl),transparent 50%),radial-gradient(ellipse at 50% 100%,var(--grn-gl),transparent 50%);pointer-events:none}
+    .colors-bar{display:flex;justify-content:center;gap:6px;margin-bottom:20px;position:relative}
+    .colors-bar span{width:28px;height:4px;border-radius:2px}
+    .c-red{background:var(--red)}.c-gold{background:var(--gold)}.c-green{background:var(--grn)}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:900;letter-spacing:-.02em;margin-bottom:6px;position:relative}
+    .hero h1 em{font-style:normal;color:var(--gold)}
+    .hero p{color:var(--txt-m);font-size:.95rem;position:relative}
+
+    .container{max-width:800px;margin:0 auto;padding:24px 16px 48px}
+    .section{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:28px 24px;margin-bottom:16px}
+    @media(max-width:500px){.section{padding:20px 16px}}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+    .section-header .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .section-header h2{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;letter-spacing:-.01em}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-grid .full{grid-column:1/-1}
+    @media(max-width:500px){.form-grid{grid-template-columns:1fr}}
+    .field label{display:block;font-size:.75rem;font-weight:600;color:var(--txt-m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .field input,.field select{width:100%;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.95rem;border:1px solid var(--brd);border-radius:var(--rs);background:var(--inp);color:var(--txt);transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none}
+    .field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-gl)}
+    .field input::placeholder{color:var(--txt-d)}
+
+    .line-items-list{display:flex;flex-direction:column;gap:10px}
+    .line-item{background:var(--inp);border:1px solid var(--brd);border-radius:var(--rs);padding:14px;display:grid;gap:10px;animation:slideIn .25s ease-out}
+    .line-item .row-top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+    .line-item .row-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    @media(max-width:500px){.line-item .row-bottom{grid-template-columns:1fr}}
+    .li-label{font-size:.7rem;font-weight:600;color:var(--txt-d);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+    .line-item input,.line-item select{width:100%;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:.9rem;border:1px solid var(--brd);border-radius:6px;background:var(--surf);color:var(--txt);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+    .line-item input:focus,.line-item select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-gl)}
+    .line-item input::placeholder{color:var(--txt-d)}
+    .line-item input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+    .line-item select option{background:var(--surf);color:var(--txt)}
+
+    .btn-rm{background:none;border:1px solid transparent;color:var(--txt-d);font-size:1.2rem;width:38px;height:38px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;align-self:end}
+    .btn-rm:hover{border-color:var(--red);color:var(--red);background:var(--red-gl)}
+
+    .btn-add{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;margin-top:10px;background:none;border:1px dashed var(--brd);border-radius:var(--rs);color:var(--txt-m);font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-add:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-gl)}
+
+    .totals{display:flex;justify-content:space-between;align-items:center;padding:20px 0 0;border-top:1px solid var(--brd);margin-top:16px;flex-wrap:wrap;gap:12px}
+    .total-item{text-align:center;flex:1;min-width:90px}
+    .t-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--txt-d);font-weight:600;margin-bottom:4px}
+    .t-value{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700}
+    .t-value.pos{color:var(--grn)}.t-value.neg{color:var(--red)}.t-value.net{color:var(--gold)}
+
+    .remarks-field textarea{width:100%;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.92rem;border:1px solid var(--brd);border-radius:var(--rs);background:var(--inp);color:var(--txt);resize:vertical;min-height:70px;outline:none;transition:border-color .2s,box-shadow .2s}
+    .remarks-field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-gl)}
+    .remarks-field textarea::placeholder{color:var(--txt-d)}
+    .remarks-field label{display:block;font-size:.75rem;font-weight:600;color:var(--txt-m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+
+    .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+    .btn-submit{flex:1;min-width:200px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 24px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--red),var(--red-dk));border:none;border-radius:var(--rs);cursor:pointer;transition:all .2s;box-shadow:0 2px 12px rgba(212,33,61,.3)}
+    .btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,33,61,.4)}
+    .btn-submit:active{transform:translateY(0)}
+    .btn-reset{padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;color:var(--txt-m);background:var(--surf);border:1px solid var(--brd);border-radius:var(--rs);cursor:pointer;transition:all .2s}
+    .btn-reset:hover{border-color:var(--txt-m);color:var(--txt)}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--surf);color:var(--txt);padding:14px 24px;border-radius:var(--r);font-weight:600;font-size:.9rem;box-shadow:0 4px 24px rgba(0,0,0,.4);border:1px solid var(--brd);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);z-index:1000;text-align:center;max-width:90vw}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast.success{border-color:var(--grn)}
+    .toast.error{border-color:var(--red)}
+
+    .footer{text-align:center;padding:24px;color:var(--txt-d);font-size:.78rem;border-top:1px solid var(--brd)}
+    .footer a{color:var(--gold-m);text-decoration:none}
+
+    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @supports(-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}
+  </style>
+</head>
+<body>
+
+  <div class="install-banner" id="installBanner" onclick="installPWA()">📲 Installeer als app op je telefoon — <span>tik hier</span></div>
+
+  <nav class="top-nav">
+    <a href="https://www.spurriemok.nl">← spurriemok.nl</a>
+    <a href="mailto:penningmeester@spurriemok.nl">✉ Penningmeester</a>
+  </nav>
+
+  <header class="hero">
+    <div class="colors-bar"><span class="c-red"></span><span class="c-gold"></span><span class="c-green"></span></div>
+    <h1>Declaratie<em>formulier</em></h1>
+    <p>V.V. de Spurriemök · Oeldere</p>
+  </header>
+
+  <main class="container">
+
+    <div class="section">
+      <div class="section-header"><div class="dot" style="background:var(--gold)"></div><h2>Gegevens declarant</h2></div>
+      <div class="form-grid">
+        <div class="field"><label for="datum">Datum</label><input type="date" id="datum" required></div>
+        <div class="field"><label for="naam">Naam</label><input type="text" id="naam" placeholder="Volledige naam" required></div>
+        <div class="field"><label for="telefoon">06-nummer</label><input type="tel" id="telefoon" placeholder="06 1234 5678" inputmode="tel"></div>
+        <div class="field"><label for="email">E-mailadres</label><input type="email" id="email" placeholder="naam@voorbeeld.nl" inputmode="email"></div>
+        <div class="field full"><label for="iban">IBAN</label><input type="text" id="iban" placeholder="NL00 BANK 0000 0000 00" required maxlength="22" oninput="formatIBAN(this)"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><div class="dot" style="background:var(--red)"></div><h2>Declaratieregels</h2></div>
+      <div class="line-items-list" id="lineItemsList"></div>
+      <button type="button" class="btn-add" onclick="addRow()">+ Regel toevoegen</button>
+      <div class="totals">
+        <div class="total-item"><div class="t-label">Te betalen</div><div class="t-value neg" id="totalBetalen">€ 0,00</div></div>
+        <div class="total-item"><div class="t-label">Te ontvangen</div><div class="t-value pos" id="totalOntvangen">€ 0,00</div></div>
+        <div class="total-item"><div class="t-label">Saldo</div><div class="t-value net" id="totalSaldo">€ 0,00</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><div class="dot" style="background:var(--grn)"></div><h2>Opmerkingen</h2></div>
+      <div class="remarks-field">
+        <label for="opmerkingen">Toelichting (optioneel)</label>
+        <textarea id="opmerkingen" placeholder="Eventuele toelichting of bijzonderheden..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-submit" onclick="submitDeclaratie()">✉️ Verstuur naar penningmeester</button>
+      <button type="button" class="btn-reset" onclick="resetForm()">Wissen</button>
+    </div>
+  </main>
+
+  <footer class="footer">© 2026 <a href="https://www.spurriemok.nl">V.V. de Spurriemök</a> · Oeldere</footer>
+  <div class="toast" id="toast"></div>
+
+<script>
+const GB=[
+  '— Selecteer —','Bonte Aovend','Prinseproclamasie','JVV','Prinserecepsie',
+  'Jeugdrecepsie','Jeugdbontemiddag','Mokkebal','Zondag','Maandag','Dinsdag',
+  'Prinsewage','Carnavalskrant','Klier','Raod','Verzekering','Overige'
+];
+let rc=0;
+
+function addRow(){
+  rc++;
+  const l=document.getElementById('lineItemsList');
+  const d=document.createElement('div');
+  d.className='line-item';
+  d.dataset.row=rc;
+  const opts=GB.map((o,i)=>`<option value="${i?o:''}">${o}</option>`).join('');
+  d.innerHTML=`
+    <div class="row-top">
+      <div><div class="li-label">Omschrijving</div><input type="text" class="inp-o" placeholder="Bijv. Stoffen voor optocht"></div>
+      <button type="button" class="btn-rm" onclick="rmRow(this)" title="Verwijder">×</button>
+    </div>
+    <div class="row-bottom">
+      <div><div class="li-label">Grootboek</div><select class="inp-g">${opts}</select></div>
+      <div><div class="li-label">Te betalen (€)</div><input type="number" class="inp-b" step="0.01" min="0" placeholder="0,00" oninput="calc()"></div>
+      <div><div class="li-label">Te ontvangen (€)</div><input type="number" class="inp-on" step="0.01" min="0" placeholder="0,00" oninput="calc()"></div>
+    </div>`;
+  l.appendChild(d);
+}
+
+function rmRow(b){b.closest('.line-item').remove();calc();if(!document.querySelectorAll('.line-item').length)addRow()}
+
+function calc(){
+  let tb=0,to=0;
+  document.querySelectorAll('.line-item').forEach(i=>{
+    tb+=parseFloat(i.querySelector('.inp-b').value)||0;
+    to+=parseFloat(i.querySelector('.inp-on').value)||0;
+  });
+  const s=to-tb;
+  document.getElementById('totalBetalen').textContent=f(tb);
+  document.getElementById('totalOntvangen').textContent=f(to);
+  const el=document.getElementById('totalSaldo');
+  el.textContent=(s>=0?'+ ':'- ')+f(Math.abs(s));
+  el.className='t-value '+(s>=0?'pos':'neg');
+}
+
+function f(v){return'€ '+v.toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function formatIBAN(e){let v=e.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase();e.value=v.match(/.{1,4}/g)?.join(' ')||v}
+function fd(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}-${m}-${y}`}
+
+function toast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+type;
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+function submitDeclaratie(){
+  const datum=document.getElementById('datum').value;
+  const naam=document.getElementById('naam').value.trim();
+  const tel=document.getElementById('telefoon').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const iban=document.getElementById('iban').value.trim();
+  const opm=document.getElementById('opmerkingen').value.trim();
+
+  if(!datum){toast('Vul een datum in.','error');return}
+  if(!naam){toast('Vul je naam in.','error');return}
+  if(!iban||iban.replace(/\s/g,'').length<15){toast('Vul een geldig IBAN in.','error');return}
+
+  let ok=false;
+  document.querySelectorAll('.line-item').forEach(i=>{
+    const o=i.querySelector('.inp-o').value.trim();
+    const b=parseFloat(i.querySelector('.inp-b').value)||0;
+    const on=parseFloat(i.querySelector('.inp-on').value)||0;
+    if(o&&(b>0||on>0))ok=true;
+  });
+  if(!ok){toast('Vul minstens één complete regel in.','error');return}
+
+  let body='DECLARATIEFORMULIER - V.V. DE SPURRIEMÖK\n';
+  body+='='.repeat(46)+'\n\n';
+  body+=`Datum:      ${fd(datum)}\nNaam:       ${naam}\n`;
+  if(tel)body+=`Telefoon:   ${tel}\n`;
+  if(email)body+=`E-mail:     ${email}\n`;
+  body+=`IBAN:       ${iban}\n\nDECLARATIEREGELS\n`+'-'.repeat(46)+'\n';
+
+  let tB=0,tO=0,nr=0;
+  document.querySelectorAll('.line-item').forEach(i=>{
+    const o=i.querySelector('.inp-o').value.trim();
+    const g=i.querySelector('.inp-g').value;
+    const b=parseFloat(i.querySelector('.inp-b').value)||0;
+    const on=parseFloat(i.querySelector('.inp-on').value)||0;
+    if(o&&(b>0||on>0)){
+      nr++;tB+=b;tO+=on;
+      body+=`\nRegel ${nr}:\n  Omschrijving:  ${o}\n  Grootboek:     ${g||'–'}\n`;
+      if(b>0)body+=`  Te betalen:    ${f(b)}\n`;
+      if(on>0)body+=`  Te ontvangen:  ${f(on)}\n`;
+    }
+  });
+
+  const s=tO-tB;
+  body+='\n'+'-'.repeat(46)+'\n';
+  body+=`Totaal te betalen:    ${f(tB)}\nTotaal te ontvangen:  ${f(tO)}\nSaldo:                ${s>=0?'+':'-'} ${f(Math.abs(s))}\n`;
+  if(opm)body+=`\nOPMERKINGEN:\n${opm}\n`;
+  body+='\n'+'='.repeat(46)+'\nVerstuurd via het Spurriemök declaratieformulier.\n';
+
+  const subj=`Declaratie ${naam} – ${fd(datum)}`;
+  window.location.href=`mailto:penningmeester@spurriemok.nl?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  toast('Je e-mailprogramma wordt geopend...');
+}
+
+function resetForm(){
+  if(!confirm('Formulier wissen?'))return;
+  ['naam','telefoon','email','iban','opmerkingen'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('lineItemsList').innerHTML='';rc=0;addRow();calc();
+  document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+  toast('Formulier gewist.');
+}
+
+// PWA Install
+let dp;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('installBanner').classList.add('show')});
+function installPWA(){if(dp){dp.prompt();dp.userChoice.then(()=>{document.getElementById('installBanner').classList.remove('show');dp=null})}}
+
+// iOS hint
+if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream&&window.navigator.standalone!==true){
+  setTimeout(()=>toast('Tip: Tik op Delen ⎙ → Zet op beginscherm','success'),2500);
+}
+
+// Service Worker registration
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// Init
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+  addRow();
+});
+</script>
+</body>
+</html>
