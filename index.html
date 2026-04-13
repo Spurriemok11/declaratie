@@ -13,6 +13,8 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root{
       --bg:#111;--bg2:#1a1a1a;--surf:#222;--red:#d4213d;--red-dk:#a81830;
@@ -56,6 +58,7 @@
     .field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-gl)}
     .field input::placeholder{color:var(--txt-d)}
 
+    /* Line items */
     .line-items-list{display:flex;flex-direction:column;gap:10px}
     .line-item{background:var(--inp);border:1px solid var(--brd);border-radius:var(--rs);padding:14px;display:grid;gap:10px;animation:slideIn .25s ease-out}
     .line-item .row-top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
@@ -80,15 +83,33 @@
     .t-value{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700}
     .t-value.pos{color:var(--grn)}.t-value.neg{color:var(--red)}.t-value.net{color:var(--gold)}
 
+    /* Photo section */
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:14px}
+    .photo-thumb{position:relative;aspect-ratio:1;border-radius:var(--rs);overflow:hidden;border:1px solid var(--brd);background:var(--inp)}
+    .photo-thumb img{width:100%;height:100%;object-fit:cover}
+    .photo-thumb .remove-photo{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:none;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .photo-thumb .remove-photo:hover{background:var(--red)}
+    .photo-thumb .photo-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#fff;font-size:.65rem;padding:3px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .photo-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn-photo{display:flex;align-items:center;justify-content:center;gap:6px;flex:1;min-width:140px;padding:12px;background:none;border:1px dashed var(--brd);border-radius:var(--rs);color:var(--txt-m);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-photo:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-gl)}
+    .photo-input{display:none}
+
+    /* Remarks */
     .remarks-field textarea{width:100%;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.92rem;border:1px solid var(--brd);border-radius:var(--rs);background:var(--inp);color:var(--txt);resize:vertical;min-height:70px;outline:none;transition:border-color .2s,box-shadow .2s}
     .remarks-field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-gl)}
     .remarks-field textarea::placeholder{color:var(--txt-d)}
     .remarks-field label{display:block;font-size:.75rem;font-weight:600;color:var(--txt-m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 
+    /* Buttons */
     .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
-    .btn-submit{flex:1;min-width:200px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 24px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--red),var(--red-dk));border:none;border-radius:var(--rs);cursor:pointer;transition:all .2s;box-shadow:0 2px 12px rgba(212,33,61,.3)}
+    .btn-submit{flex:1;min-width:180px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 24px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--red),var(--red-dk));border:none;border-radius:var(--rs);cursor:pointer;transition:all .2s;box-shadow:0 2px 12px rgba(212,33,61,.3)}
     .btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,33,61,.4)}
     .btn-submit:active{transform:translateY(0)}
+    .btn-submit:disabled{opacity:.5;pointer-events:none}
+    .btn-share{flex:1;min-width:140px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;color:var(--txt);background:var(--surf);border:1px solid var(--gold-m);border-radius:var(--rs);cursor:pointer;transition:all .2s}
+    .btn-share:hover{background:var(--gold-gl);border-color:var(--gold)}
     .btn-reset{padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;color:var(--txt-m);background:var(--surf);border:1px solid var(--brd);border-radius:var(--rs);cursor:pointer;transition:all .2s}
     .btn-reset:hover{border-color:var(--txt-m);color:var(--txt)}
 
@@ -121,6 +142,7 @@
 
   <main class="container">
 
+    <!-- ═══ DECLARANT ═══ -->
     <div class="section">
       <div class="section-header"><div class="dot" style="background:var(--gold)"></div><h2>Gegevens declarant</h2></div>
       <div class="form-grid">
@@ -132,6 +154,7 @@
       </div>
     </div>
 
+    <!-- ═══ REGELS ═══ -->
     <div class="section">
       <div class="section-header"><div class="dot" style="background:var(--red)"></div><h2>Declaratieregels</h2></div>
       <div class="line-items-list" id="lineItemsList"></div>
@@ -143,6 +166,25 @@
       </div>
     </div>
 
+    <!-- ═══ FOTO'S / BONNETJES ═══ -->
+    <div class="section">
+      <div class="section-header"><div class="dot" style="background:var(--gold)"></div><h2>Foto's van bonnetjes</h2></div>
+      <div class="photo-grid" id="photoGrid"></div>
+      <div class="photo-actions">
+        <button type="button" class="btn-photo" onclick="document.getElementById('cameraInput').click()">
+          📷 Maak foto
+        </button>
+        <button type="button" class="btn-photo" onclick="document.getElementById('fileInput').click()">
+          📁 Kies bestand
+        </button>
+      </div>
+      <!-- Camera capture (mobile) -->
+      <input type="file" id="cameraInput" class="photo-input" accept="image/*" capture="environment" multiple onchange="handlePhotos(this)">
+      <!-- File picker (desktop / gallery) -->
+      <input type="file" id="fileInput" class="photo-input" accept="image/*" multiple onchange="handlePhotos(this)">
+    </div>
+
+    <!-- ═══ OPMERKINGEN ═══ -->
     <div class="section">
       <div class="section-header"><div class="dot" style="background:var(--grn)"></div><h2>Opmerkingen</h2></div>
       <div class="remarks-field">
@@ -151,8 +193,11 @@
       </div>
     </div>
 
+    <!-- ═══ ACTIES ═══ -->
     <div class="actions">
-      <button type="button" class="btn-submit" onclick="submitDeclaratie()">✉️ Verstuur naar penningmeester</button>
+      <button type="button" class="btn-submit" id="btnPdf" onclick="generatePDF()">
+        📄 Maak PDF &amp; verstuur
+      </button>
       <button type="button" class="btn-reset" onclick="resetForm()">Wissen</button>
     </div>
   </main>
@@ -161,21 +206,27 @@
   <div class="toast" id="toast"></div>
 
 <script>
-const GB=[
+/* ═══════════════════════════════════════════
+   GROOTBOEK OPTIONS
+   ═══════════════════════════════════════════ */
+const GB = [
   '— Selecteer —','Bonte Aovend','Prinseproclamasie','JVV','Prinserecepsie',
   'Jeugdrecepsie','Jeugdbontemiddag','Mokkebal','Zondag','Maandag','Dinsdag',
   'Prinsewage','Carnavalskrant','Klier','Raod','Verzekering','Overige'
 ];
-let rc=0;
 
-function addRow(){
+/* ═══════════════════════════════════════════
+   LINE ITEMS
+   ═══════════════════════════════════════════ */
+let rc = 0;
+
+function addRow() {
   rc++;
-  const l=document.getElementById('lineItemsList');
-  const d=document.createElement('div');
-  d.className='line-item';
-  d.dataset.row=rc;
-  const opts=GB.map((o,i)=>`<option value="${i?o:''}">${o}</option>`).join('');
-  d.innerHTML=`
+  const l = document.getElementById('lineItemsList');
+  const d = document.createElement('div');
+  d.className = 'line-item';
+  const opts = GB.map((o, i) => `<option value="${i ? o : ''}">${o}</option>`).join('');
+  d.innerHTML = `
     <div class="row-top">
       <div><div class="li-label">Omschrijving</div><input type="text" class="inp-o" placeholder="Bijv. Stoffen voor optocht"></div>
       <button type="button" class="btn-rm" onclick="rmRow(this)" title="Verwijder">×</button>
@@ -188,112 +239,407 @@ function addRow(){
   l.appendChild(d);
 }
 
-function rmRow(b){b.closest('.line-item').remove();calc();if(!document.querySelectorAll('.line-item').length)addRow()}
-
-function calc(){
-  let tb=0,to=0;
-  document.querySelectorAll('.line-item').forEach(i=>{
-    tb+=parseFloat(i.querySelector('.inp-b').value)||0;
-    to+=parseFloat(i.querySelector('.inp-on').value)||0;
-  });
-  const s=to-tb;
-  document.getElementById('totalBetalen').textContent=f(tb);
-  document.getElementById('totalOntvangen').textContent=f(to);
-  const el=document.getElementById('totalSaldo');
-  el.textContent=(s>=0?'+ ':'- ')+f(Math.abs(s));
-  el.className='t-value '+(s>=0?'pos':'neg');
+function rmRow(b) {
+  b.closest('.line-item').remove();
+  calc();
+  if (!document.querySelectorAll('.line-item').length) addRow();
 }
 
-function f(v){return'€ '+v.toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function formatIBAN(e){let v=e.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase();e.value=v.match(/.{1,4}/g)?.join(' ')||v}
-function fd(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}-${m}-${y}`}
-
-function toast(msg,type='success'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast '+type;
-  setTimeout(()=>t.classList.add('show'),10);
-  setTimeout(()=>t.classList.remove('show'),4000);
+function calc() {
+  let tb = 0, to = 0;
+  document.querySelectorAll('.line-item').forEach(i => {
+    tb += parseFloat(i.querySelector('.inp-b').value) || 0;
+    to += parseFloat(i.querySelector('.inp-on').value) || 0;
+  });
+  const s = to - tb;
+  document.getElementById('totalBetalen').textContent = eur(tb);
+  document.getElementById('totalOntvangen').textContent = eur(to);
+  const el = document.getElementById('totalSaldo');
+  el.textContent = (s >= 0 ? '+ ' : '- ') + eur(Math.abs(s));
+  el.className = 't-value ' + (s >= 0 ? 'pos' : 'neg');
 }
 
-function submitDeclaratie(){
-  const datum=document.getElementById('datum').value;
-  const naam=document.getElementById('naam').value.trim();
-  const tel=document.getElementById('telefoon').value.trim();
-  const email=document.getElementById('email').value.trim();
-  const iban=document.getElementById('iban').value.trim();
-  const opm=document.getElementById('opmerkingen').value.trim();
+/* ═══════════════════════════════════════════
+   PHOTOS
+   ═══════════════════════════════════════════ */
+let photos = []; // { name, dataUrl }
 
-  if(!datum){toast('Vul een datum in.','error');return}
-  if(!naam){toast('Vul je naam in.','error');return}
-  if(!iban||iban.replace(/\s/g,'').length<15){toast('Vul een geldig IBAN in.','error');return}
-
-  let ok=false;
-  document.querySelectorAll('.line-item').forEach(i=>{
-    const o=i.querySelector('.inp-o').value.trim();
-    const b=parseFloat(i.querySelector('.inp-b').value)||0;
-    const on=parseFloat(i.querySelector('.inp-on').value)||0;
-    if(o&&(b>0||on>0))ok=true;
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Resize image to max 1200px for reasonable PDF size
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        photos.push({ name: file.name, dataUrl, w, h });
+        renderPhotos();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   });
-  if(!ok){toast('Vul minstens één complete regel in.','error');return}
+  input.value = '';
+}
 
-  let body='DECLARATIEFORMULIER - V.V. DE SPURRIEMÖK\n';
-  body+='='.repeat(46)+'\n\n';
-  body+=`Datum:      ${fd(datum)}\nNaam:       ${naam}\n`;
-  if(tel)body+=`Telefoon:   ${tel}\n`;
-  if(email)body+=`E-mail:     ${email}\n`;
-  body+=`IBAN:       ${iban}\n\nDECLARATIEREGELS\n`+'-'.repeat(46)+'\n';
+function removePhoto(idx) {
+  photos.splice(idx, 1);
+  renderPhotos();
+}
 
-  let tB=0,tO=0,nr=0;
-  document.querySelectorAll('.line-item').forEach(i=>{
-    const o=i.querySelector('.inp-o').value.trim();
-    const g=i.querySelector('.inp-g').value;
-    const b=parseFloat(i.querySelector('.inp-b').value)||0;
-    const on=parseFloat(i.querySelector('.inp-on').value)||0;
-    if(o&&(b>0||on>0)){
-      nr++;tB+=b;tO+=on;
-      body+=`\nRegel ${nr}:\n  Omschrijving:  ${o}\n  Grootboek:     ${g||'–'}\n`;
-      if(b>0)body+=`  Te betalen:    ${f(b)}\n`;
-      if(on>0)body+=`  Te ontvangen:  ${f(on)}\n`;
+function renderPhotos() {
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = photos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p.dataUrl}" alt="${p.name}">
+      <button class="remove-photo" onclick="removePhoto(${i})">×</button>
+      <div class="photo-label">${p.name}</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════ */
+function eur(v) { return '€ ' + v.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function formatIBAN(e) { let v = e.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase(); e.value = v.match(/.{1,4}/g)?.join(' ') || v; }
+function fd(d) { if (!d) return ''; const [y, m, dd] = d.split('-'); return `${dd}-${m}-${y}`; }
+
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+function validate() {
+  const datum = document.getElementById('datum').value;
+  const naam = document.getElementById('naam').value.trim();
+  const iban = document.getElementById('iban').value.trim();
+  if (!datum) { toast('Vul een datum in.', 'error'); return false; }
+  if (!naam) { toast('Vul je naam in.', 'error'); return false; }
+  if (!iban || iban.replace(/\s/g, '').length < 15) { toast('Vul een geldig IBAN in.', 'error'); return false; }
+  let ok = false;
+  document.querySelectorAll('.line-item').forEach(i => {
+    const o = i.querySelector('.inp-o').value.trim();
+    const b = parseFloat(i.querySelector('.inp-b').value) || 0;
+    const on = parseFloat(i.querySelector('.inp-on').value) || 0;
+    if (o && (b > 0 || on > 0)) ok = true;
+  });
+  if (!ok) { toast('Vul minstens één complete regel in.', 'error'); return false; }
+  return true;
+}
+
+/* ═══════════════════════════════════════════
+   PDF GENERATION
+   ═══════════════════════════════════════════ */
+function generatePDF() {
+  if (!validate()) return;
+
+  const btn = document.getElementById('btnPdf');
+  btn.disabled = true;
+  btn.textContent = '⏳ PDF genereren...';
+
+  // Small delay so UI updates
+  setTimeout(() => {
+    try {
+      _buildPDF();
+    } catch (err) {
+      console.error(err);
+      toast('Fout bij genereren PDF: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '📄 Maak PDF &amp; verstuur';
+    }
+  }, 100);
+}
+
+function _buildPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const M = 20; // margin
+  let y = M;
+
+  // ─── COLOR HEADER BAR ───
+  doc.setFillColor(212, 33, 61);
+  doc.rect(0, 0, W / 3, 4, 'F');
+  doc.setFillColor(240, 197, 48);
+  doc.rect(W / 3, 0, W / 3, 4, 'F');
+  doc.setFillColor(45, 143, 69);
+  doc.rect(2 * W / 3, 0, W / 3, 4, 'F');
+
+  y = 14;
+
+  // ─── TITLE ───
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(33, 33, 33);
+  doc.text('Declaratieformulier', M, y);
+  y += 7;
+  doc.setFontSize(11);
+  doc.setTextColor(120, 120, 120);
+  doc.text('V.V. de Spurriemök · Oeldere', M, y);
+  y += 10;
+
+  // ─── DECLARANT INFO ───
+  doc.setDrawColor(220, 220, 220);
+  doc.setFillColor(248, 248, 248);
+  doc.roundedRect(M, y, W - 2 * M, 42, 3, 3, 'FD');
+  y += 7;
+
+  const datum = document.getElementById('datum').value;
+  const naam = document.getElementById('naam').value.trim();
+  const telefoon = document.getElementById('telefoon').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const iban = document.getElementById('iban').value.trim();
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(130, 130, 130);
+
+  const col1 = M + 5;
+  const col2 = M + 90;
+
+  doc.text('DATUM', col1, y); doc.text('NAAM', col2, y);
+  y += 5;
+  doc.setFontSize(10);
+  doc.setTextColor(33, 33, 33);
+  doc.setFont('helvetica', 'bold');
+  doc.text(fd(datum), col1, y); doc.text(naam, col2, y);
+  y += 8;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(130, 130, 130);
+  doc.text('06-NUMMER', col1, y); doc.text('E-MAIL', col2, y);
+  y += 5;
+  doc.setFontSize(10);
+  doc.setTextColor(33, 33, 33);
+  doc.setFont('helvetica', 'bold');
+  doc.text(telefoon || '–', col1, y); doc.text(email || '–', col2, y);
+  y += 8;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(130, 130, 130);
+  doc.text('IBAN', col1, y);
+  y += 5;
+  doc.setFontSize(10);
+  doc.setTextColor(33, 33, 33);
+  doc.setFont('helvetica', 'bold');
+  doc.text(iban, col1, y);
+  y += 12;
+
+  // ─── TABLE ───
+  const rows = [];
+  let tB = 0, tO = 0;
+  document.querySelectorAll('.line-item').forEach(item => {
+    const o = item.querySelector('.inp-o').value.trim();
+    const g = item.querySelector('.inp-g').value;
+    const b = parseFloat(item.querySelector('.inp-b').value) || 0;
+    const on = parseFloat(item.querySelector('.inp-on').value) || 0;
+    if (o && (b > 0 || on > 0)) {
+      tB += b;
+      tO += on;
+      rows.push([o, g || '–', b > 0 ? eur(b) : '', on > 0 ? eur(on) : '']);
     }
   });
 
-  const s=tO-tB;
-  body+='\n'+'-'.repeat(46)+'\n';
-  body+=`Totaal te betalen:    ${f(tB)}\nTotaal te ontvangen:  ${f(tO)}\nSaldo:                ${s>=0?'+':'-'} ${f(Math.abs(s))}\n`;
-  if(opm)body+=`\nOPMERKINGEN:\n${opm}\n`;
-  body+='\n'+'='.repeat(46)+'\nVerstuurd via het Spurriemök declaratieformulier.\n';
+  doc.autoTable({
+    startY: y,
+    margin: { left: M, right: M },
+    head: [['Omschrijving', 'Grootboek', 'Te betalen', 'Te ontvangen']],
+    body: rows,
+    foot: [['', 'Totaal', eur(tB), eur(tO)]],
+    headStyles: {
+      fillColor: [33, 33, 33],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9
+    },
+    bodyStyles: { fontSize: 9, textColor: [50, 50, 50] },
+    footStyles: {
+      fillColor: [248, 248, 248],
+      textColor: [33, 33, 33],
+      fontStyle: 'bold',
+      fontSize: 9
+    },
+    alternateRowStyles: { fillColor: [252, 252, 252] },
+    columnStyles: {
+      0: { cellWidth: 55 },
+      2: { halign: 'right' },
+      3: { halign: 'right' }
+    },
+    theme: 'grid',
+    styles: { lineColor: [220, 220, 220], lineWidth: 0.3 }
+  });
 
-  const subj=`Declaratie ${naam} – ${fd(datum)}`;
-  window.location.href=`mailto:penningmeester@spurriemok.nl?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-  toast('Je e-mailprogramma wordt geopend...');
+  y = doc.lastAutoTable.finalY + 6;
+
+  // ─── SALDO ───
+  const saldo = tO - tB;
+  doc.setFillColor(saldo >= 0 ? 45 : 212, saldo >= 0 ? 143 : 33, saldo >= 0 ? 69 : 61);
+  doc.roundedRect(W - M - 65, y, 65, 10, 2, 2, 'F');
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('Saldo: ' + (saldo >= 0 ? '+' : '-') + ' ' + eur(Math.abs(saldo)), W - M - 62, y + 7);
+  y += 16;
+
+  // ─── OPMERKINGEN ───
+  const opm = document.getElementById('opmerkingen').value.trim();
+  if (opm) {
+    if (y > H - 40) { doc.addPage(); y = M; }
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(130, 130, 130);
+    doc.text('OPMERKINGEN', M, y);
+    y += 5;
+    doc.setFontSize(9);
+    doc.setTextColor(50, 50, 50);
+    const lines = doc.splitTextToSize(opm, W - 2 * M);
+    doc.text(lines, M, y);
+    y += lines.length * 4.5 + 6;
+  }
+
+  // ─── PHOTOS ───
+  if (photos.length > 0) {
+    photos.forEach((photo, idx) => {
+      doc.addPage();
+      // Color bar on each photo page
+      doc.setFillColor(212, 33, 61);
+      doc.rect(0, 0, W / 3, 3, 'F');
+      doc.setFillColor(240, 197, 48);
+      doc.rect(W / 3, 0, W / 3, 3, 'F');
+      doc.setFillColor(45, 143, 69);
+      doc.rect(2 * W / 3, 0, W / 3, 3, 'F');
+
+      let py = 12;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(33, 33, 33);
+      doc.text(`Bijlage ${idx + 1}: ${photo.name}`, M, py);
+      py += 6;
+
+      // Fit image on page
+      const maxW = W - 2 * M;
+      const maxH = H - py - M;
+      let imgW = photo.w;
+      let imgH = photo.h;
+
+      // Convert px to mm (assume 96dpi → 1px ≈ 0.264mm)
+      imgW *= 0.264;
+      imgH *= 0.264;
+
+      const scaleW = maxW / imgW;
+      const scaleH = maxH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+
+      try {
+        doc.addImage(photo.dataUrl, 'JPEG', M, py, imgW, imgH);
+      } catch (e) {
+        doc.setFontSize(9);
+        doc.setTextColor(200, 0, 0);
+        doc.text('Foto kon niet worden toegevoegd.', M, py + 10);
+      }
+    });
+  }
+
+  // ─── FOOTER on page 1 ───
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(180, 180, 180);
+    doc.text(`Declaratie ${naam} · ${fd(datum)} · Pagina ${p}/${pageCount}`, M, H - 8);
+  }
+
+  // ─── OUTPUT ───
+  const fileName = `Declaratie_${naam.replace(/\s+/g, '_')}_${datum}.pdf`;
+  const pdfBlob = doc.output('blob');
+  const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+  // Try Web Share API (works great on iOS/Android)
+  if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+    navigator.share({
+      title: `Declaratie ${naam}`,
+      text: `Declaratie van ${naam} d.d. ${fd(datum)}`,
+      files: [pdfFile]
+    }).then(() => {
+      toast('PDF gedeeld!');
+    }).catch((err) => {
+      if (err.name !== 'AbortError') {
+        // Fallback: download
+        doc.save(fileName);
+        toast('PDF gedownload! Stuur als bijlage naar penningmeester@spurriemok.nl');
+      }
+    });
+  } else {
+    // Desktop fallback: download
+    doc.save(fileName);
+    toast('PDF gedownload! Stuur als bijlage naar penningmeester@spurriemok.nl');
+  }
 }
 
-function resetForm(){
-  if(!confirm('Formulier wissen?'))return;
-  ['naam','telefoon','email','iban','opmerkingen'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('lineItemsList').innerHTML='';rc=0;addRow();calc();
-  document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+/* ═══════════════════════════════════════════
+   FORM RESET
+   ═══════════════════════════════════════════ */
+function resetForm() {
+  if (!confirm('Formulier wissen? Alle gegevens en foto\'s worden verwijderd.')) return;
+  ['naam','telefoon','email','iban','opmerkingen'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('lineItemsList').innerHTML = '';
+  rc = 0;
+  photos = [];
+  renderPhotos();
+  addRow();
+  calc();
+  document.getElementById('datum').value = new Date().toISOString().split('T')[0];
   toast('Formulier gewist.');
 }
 
-// PWA Install
+/* ═══════════════════════════════════════════
+   PWA INSTALL
+   ═══════════════════════════════════════════ */
 let dp;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('installBanner').classList.add('show')});
-function installPWA(){if(dp){dp.prompt();dp.userChoice.then(()=>{document.getElementById('installBanner').classList.remove('show');dp=null})}}
-
-// iOS hint
-if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream&&window.navigator.standalone!==true){
-  setTimeout(()=>toast('Tip: Tik op Delen ⎙ → Zet op beginscherm','success'),2500);
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); dp = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+function installPWA() {
+  if (dp) { dp.prompt(); dp.userChoice.then(() => { document.getElementById('installBanner').classList.remove('show'); dp = null; }); }
 }
 
-// Service Worker registration
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+// iOS hint
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream && window.navigator.standalone !== true) {
+  setTimeout(() => toast('Tip: Tik op Delen ⎙ → Zet op beginscherm', 'success'), 2500);
+}
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
 // Init
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('datum').value = new Date().toISOString().split('T')[0];
   addRow();
 });
 </script>

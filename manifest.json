@@ -2,7 +2,7 @@
   "name": "Declaratie – V.V. de Spurriemök",
   "short_name": "Spurriemök",
   "description": "Declaratieformulier V.V. de Spurriemök Oirlo",
-  "start_url": "/declaratie-spurriemok.html",
+  "start_url": "/declaratie/",
   "display": "standalone",
   "background_color": "#111111",
   "theme_color": "#1a1a1a",
