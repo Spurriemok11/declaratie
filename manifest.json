@@ -4,8 +4,8 @@
   "description": "Declaratieformulier V.V. de Spurriemök Oirlo",
   "start_url": "/declaratie/",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#1a1a1a",
+  "background_color": "#7ec8e3",
+  "theme_color": "#7ec8e3",
   "orientation": "portrait",
   "icons": [
     {
